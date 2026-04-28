@@ -1,0 +1,29 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Users can read and write their own profile
+    match /users/{userId} {
+      allow read, write: if request.auth != null && request.auth.uid == userId;
+    }
+
+    // Allow read access to police_stations collection for all authenticated users
+    match /police_stations/{document=**} {
+      allow read: if request.auth != null;
+    }
+
+    // Allow read access to emergency_contacts collection for authenticated users
+    match /emergency_contacts/{userId} {
+      allow read, write: if request.auth != null && request.auth.uid == userId;
+    }
+
+    // Allow read access to evidence collection for authenticated users
+    match /evidence/{userId} {
+      allow read, write: if request.auth != null && request.auth.uid == userId;
+    }
+
+    // Default rule for other collections (disallow access until defined)
+    match /{document=**} {
+      allow read, write: if false; // Safest for now, can be modified later
+    }
+  }
+}
